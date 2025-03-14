@@ -6,14 +6,7 @@
     // Function to generate sort links
     function getSortLink($field, $currentSortBy, $currentSortOrder) {
         $newOrder = ($currentSortBy === $field && $currentSortOrder === 'asc') ? 'desc' : 'asc';
-        $icon = '';
-        
-        if ($currentSortBy === $field) {
-            $icon = $currentSortOrder === 'asc' ? ' ▲' : ' ▼';
-        }
-        
-        $csrfToken = Utils::generateCsrfToken('monitoring_sort');
-        return "index.php?action=showMonitoring&sort={$field}&order={$newOrder}&csrf_token={$csrfToken}" . $icon;
+        return "index.php?action=showMonitoring&sort={$field}&order={$newOrder}";
     }
 ?>
 

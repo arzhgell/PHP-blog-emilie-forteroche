@@ -258,20 +258,6 @@ class AdminController {
         // Check if user is connected
         $this->checkIfUserIsConnected();
 
-        // Vérification du jeton CSRF pour les actions de tri
-        // Seulement si ce n'est pas le premier accès à la page (présence de paramètres de tri)
-        $hasParams = isset($_GET['sort']) || isset($_GET['order']);
-        if ($hasParams) {
-            $csrfToken = Utils::request("csrf_token");
-            $validToken = $csrfToken && Utils::validateCsrfToken($csrfToken, 'monitoring_sort', false);
-            
-            if (!$validToken) {
-                // Rediriger vers la page de monitoring sans paramètres plutôt que de lancer une exception
-                Utils::redirect("showMonitoring");
-                return;
-            }
-        }
-
         // Get sorting parameters
         $sortBy = Utils::requestString('sort', 'date_creation'); // Default sort by creation date
         $sortOrder = Utils::requestString('order', 'desc'); // Default order is descending
@@ -289,7 +275,18 @@ class AdminController {
 
         // Get article statistics
         $articleManager = new ArticleManager();
-        $articles = $articleManager->getAllArticles();
+        
+        // Si le tri est par commentaires, nous devons le faire manuellement
+        // Sinon, nous utilisons le tri SQL
+        $sqlSortBy = $sortBy;
+        $needsManualSort = false;
+        
+        if ($sortBy === 'comments') {
+            $sqlSortBy = 'date_creation'; // Tri par défaut, sera remplacé par un tri manuel
+            $needsManualSort = true;
+        }
+        
+        $articles = $articleManager->getAllArticles($sqlSortBy, $sortOrder);
         
         // Total number of articles
         $totalArticles = count($articles);
@@ -349,41 +346,17 @@ class AdminController {
         
         $mostCommentedArticle = $articleManager->getArticleById($mostCommentedArticleId);
         
-        // Sort articles according to parameters
-        usort($articles, function($a, $b) use ($sortBy, $sortOrder, $commentsPerArticle) {
-            $result = 0;
-            
-            switch ($sortBy) {
-                case 'title':
-                    $result = strcmp($a->getTitle(), $b->getTitle());
-                    break;
-                    
-                case 'date_creation':
-                    $dateA = $a->getDateCreation();
-                    $dateB = $b->getDateCreation();
-                    $result = $dateA <=> $dateB;
-                    break;
-                    
-                case 'date_update':
-                    $dateA = $a->getDateUpdate() ?: new DateTime('1970-01-01');
-                    $dateB = $b->getDateUpdate() ?: new DateTime('1970-01-01');
-                    $result = $dateA <=> $dateB;
-                    break;
-                    
-                case 'views_count':
-                    $result = $a->getViewsCount() <=> $b->getViewsCount();
-                    break;
-                    
-                case 'comments':
-                    $commentsA = $commentsPerArticle[$a->getId()] ?? 0;
-                    $commentsB = $commentsPerArticle[$b->getId()] ?? 0;
-                    $result = $commentsA <=> $commentsB;
-                    break;
-            }
-            
-            // Reverse result if order is descending
-            return $sortOrder === 'desc' ? -$result : $result;
-        });
+        // Si nous avons besoin d'un tri manuel (par nombre de commentaires)
+        if ($needsManualSort) {
+            usort($articles, function($a, $b) use ($commentsPerArticle, $sortOrder) {
+                $commentsA = $commentsPerArticle[$a->getId()] ?? 0;
+                $commentsB = $commentsPerArticle[$b->getId()] ?? 0;
+                $result = $commentsA <=> $commentsB;
+                
+                // Reverse result if order is descending
+                return $sortOrder === 'desc' ? -$result : $result;
+            });
+        }
         
         // Display monitoring page
         $view = new View("Monitoring");
@@ -449,24 +422,6 @@ class AdminController {
         // Check if user is connected
         $this->checkIfUserIsConnected();
 
-        // Vérification du jeton CSRF pour les actions de pagination et de tri
-        // Seulement si ce n'est pas le premier accès à la page (présence de paramètres de tri ou pagination)
-        $hasParams = isset($_GET['page']) || isset($_GET['sort']) || isset($_GET['order']) || isset($_GET['per_page']);
-        if ($hasParams) {
-            $csrfToken = Utils::request("csrf_token");
-            // Accepter les jetons de pagination_form ou pagination_link
-            $validToken = $csrfToken && (
-                Utils::validateCsrfToken($csrfToken, 'pagination_form', false) || 
-                Utils::validateCsrfToken($csrfToken, 'pagination_link', false)
-            );
-            
-            if (!$validToken) {
-                // Rediriger vers la page de commentaires sans paramètres plutôt que de lancer une exception
-                Utils::redirect("showComments");
-                return;
-            }
-        }
-
         // Get pagination parameters
         $page = Utils::requestInt('page', 1);
         $commentsPerPage = Utils::requestInt('per_page', 10);
@@ -497,33 +452,9 @@ class AdminController {
 
         // Get all comments with article information
         $commentManager = new CommentManager();
-        $result = $commentManager->getAllCommentsWithArticleInfo($page, $commentsPerPage);
+        $result = $commentManager->getAllCommentsWithArticleInfo($page, $commentsPerPage, $sortBy, $sortOrder);
         $commentsData = $result['comments'];
         $pagination = $result['pagination'];
-
-        // Sort comments according to parameters
-        usort($commentsData, function($a, $b) use ($sortBy, $sortOrder) {
-            $result = 0;
-            
-            switch ($sortBy) {
-                case 'pseudo':
-                    $result = strcmp($a['comment']->getPseudo(), $b['comment']->getPseudo());
-                    break;
-                    
-                case 'date_creation':
-                    $dateA = $a['comment']->getDateCreation();
-                    $dateB = $b['comment']->getDateCreation();
-                    $result = $dateA <=> $dateB;
-                    break;
-                    
-                case 'article_title':
-                    $result = strcmp($a['article_title'], $b['article_title']);
-                    break;
-            }
-            
-            // Reverse result if order is descending
-            return $sortOrder === 'desc' ? -$result : $result;
-        });
 
         // Display comments management page
         $view = new View("Gestion des commentaires");

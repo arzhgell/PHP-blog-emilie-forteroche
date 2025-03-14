@@ -7,10 +7,25 @@ class ArticleManager extends AbstractEntityManager
 {
     /**
      * Gets all articles
+     * @param string $sortBy Field to sort by (title, date_creation, date_update, views_count)
+     * @param string $sortOrder Sort order (asc, desc)
+     * @return array Array of Article objects
      */
-    public function getAllArticles() : array
+    public function getAllArticles(string $sortBy = 'date_creation', string $sortOrder = 'desc') : array
     {
-        $sql = "SELECT * FROM article";
+        // Validate sort parameters
+        $allowedSortFields = ['title', 'date_creation', 'date_update', 'views_count'];
+        if (!in_array($sortBy, $allowedSortFields)) {
+            $sortBy = 'date_creation'; // Default value if sort field is not valid
+        }
+
+        $allowedSortOrders = ['asc', 'desc'];
+        if (!in_array($sortOrder, $allowedSortOrders)) {
+            $sortOrder = 'desc'; // Default value if sort order is not valid
+        }
+
+        // Build SQL query with ORDER BY clause
+        $sql = "SELECT * FROM article ORDER BY {$sortBy} {$sortOrder}";
         $result = $this->db->query($sql);
         $articles = [];
 

@@ -6,20 +6,12 @@
     // Function to generate sort links
     function getSortLink($field, $currentSortBy, $currentSortOrder, $currentPage, $commentsPerPage) {
         $newOrder = ($currentSortBy === $field && $currentSortOrder === 'asc') ? 'desc' : 'asc';
-        $icon = '';
-        
-        if ($currentSortBy === $field) {
-            $icon = $currentSortOrder === 'asc' ? ' ▲' : ' ▼';
-        }
-        
-        $csrfToken = Utils::generateCsrfToken('pagination_link');
-        return "index.php?action=showComments&sort={$field}&order={$newOrder}&page={$currentPage}&per_page={$commentsPerPage}&csrf_token={$csrfToken}" . $icon;
+        return "index.php?action=showComments&sort={$field}&order={$newOrder}&page={$currentPage}&per_page={$commentsPerPage}";
     }
     
     // Function to generate pagination links
     function getPaginationLink($page, $sortBy, $sortOrder, $commentsPerPage) {
-        $csrfToken = Utils::generateCsrfToken('pagination_link');
-        return "index.php?action=showComments&page={$page}&sort={$sortBy}&order={$sortOrder}&per_page={$commentsPerPage}&csrf_token={$csrfToken}";
+        return "index.php?action=showComments&page={$page}&sort={$sortBy}&order={$sortOrder}&per_page={$commentsPerPage}";
     }
 ?>
 
@@ -43,7 +35,6 @@
                     <input type="hidden" name="sort" value="<?= $sortBy ?>">
                     <input type="hidden" name="order" value="<?= $sortOrder ?>">
                     <input type="hidden" name="page" value="1">
-                    <input type="hidden" name="csrf_token" value="<?= Utils::generateCsrfToken('pagination_form') ?>">
                     <label for="per_page">Commentaires par page :</label>
                     <select name="per_page" id="per_page" onchange="this.form.submit()">
                         <?php foreach ([5, 10, 20, 30, 50] as $option): ?>

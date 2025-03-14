@@ -128,6 +128,13 @@ class Utils {
      */
     public static function generateCsrfToken(string $formName = 'default') : string
     {
+        // Pour les actions de tri et de pagination, on retourne un jeton fixe
+        // car ces actions sont considérées comme sûres (lecture seule)
+        $noValidationRequired = ['monitoring_sort', 'pagination_link', 'pagination_form'];
+        if (in_array($formName, $noValidationRequired)) {
+            return 'no_validation_required';
+        }
+        
         $token = bin2hex(random_bytes(32));
         $_SESSION['csrf_tokens'][$formName] = $token;
         return $token;
@@ -142,13 +149,20 @@ class Utils {
      */
     public static function validateCsrfToken(string $token, string $formName = 'default', bool $removeAfterValidation = true) : bool
     {
+        // Pour les actions de tri et de pagination, on désactive la validation CSRF
+        // car ces actions sont considérées comme sûres (lecture seule)
+        $noValidationRequired = ['monitoring_sort', 'pagination_link', 'pagination_form'];
+        if (in_array($formName, $noValidationRequired)) {
+            return true;
+        }
+        
         if (!isset($_SESSION['csrf_tokens'][$formName])) {
             return false;
         }
         
         $valid = hash_equals($_SESSION['csrf_tokens'][$formName], $token);
         
-        // Token is single-use if $removeAfterValidation is true
+        // Si on doit supprimer le jeton après validation
         if ($valid && $removeAfterValidation) {
             unset($_SESSION['csrf_tokens'][$formName]);
         }

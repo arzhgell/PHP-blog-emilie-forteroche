@@ -26,10 +26,33 @@ class CommentManager extends AbstractEntityManager
      * Get all comments with associated article information
      * @param int $page : current page number (starts at 1)
      * @param int $commentsPerPage : number of comments per page
+     * @param string $sortBy : field to sort by (pseudo, date_creation, article_title)
+     * @param string $sortOrder : sort order (asc, desc)
      * @return array : associative array containing comments, article titles and pagination info
      */
-    public function getAllCommentsWithArticleInfo(int $page = 1, int $commentsPerPage = 10) : array
+    public function getAllCommentsWithArticleInfo(int $page = 1, int $commentsPerPage = 10, string $sortBy = 'date_creation', string $sortOrder = 'desc') : array
     {
+        // Validate sort parameters
+        $allowedSortFields = ['pseudo', 'date_creation', 'article_title'];
+        if (!in_array($sortBy, $allowedSortFields)) {
+            $sortBy = 'date_creation'; // Default value if sort field is not valid
+        }
+
+        $allowedSortOrders = ['asc', 'desc'];
+        if (!in_array($sortOrder, $allowedSortOrders)) {
+            $sortOrder = 'desc'; // Default value if sort order is not valid
+        }
+        
+        // Map sort field to actual column in query
+        $sortColumn = $sortBy;
+        if ($sortBy === 'article_title') {
+            $sortColumn = 'a.title';
+        } elseif ($sortBy === 'pseudo') {
+            $sortColumn = 'c.pseudo';
+        } elseif ($sortBy === 'date_creation') {
+            $sortColumn = 'c.date_creation';
+        }
+        
         // Calculate offset for SQL query
         $offset = ($page - 1) * $commentsPerPage;
         
@@ -41,11 +64,11 @@ class CommentManager extends AbstractEntityManager
         // Calculate total pages
         $totalPages = ceil($totalComments / $commentsPerPage);
         
-        // Query to get comments with pagination
+        // Query to get comments with pagination and sorting
         $sql = "SELECT c.*, a.title as article_title 
                 FROM comment c 
                 JOIN article a ON c.id_article = a.id 
-                ORDER BY c.date_creation DESC
+                ORDER BY {$sortColumn} {$sortOrder}
                 LIMIT " . (int)$commentsPerPage . " OFFSET " . (int)$offset;
                 
         $result = $this->db->query($sql);
