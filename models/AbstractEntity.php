@@ -2,14 +2,11 @@
 
 abstract class AbstractEntity 
 {
-    // Par défaut l'id vaut -1, ce qui permet de vérifier facilement si l'entité est nouvelle ou pas. 
+    // Default id is -1 to identify new entities
     protected int $id = -1;
 
     /**
-     * Constructeur de la classe.
-     * Si un tableau associatif est passé en paramètre, on hydrate l'entité.
-     * 
-     * @param array $data
+     * Constructor with optional data for hydration
      */
     public function __construct(array $data = []) 
     {
@@ -19,11 +16,8 @@ abstract class AbstractEntity
     }
 
     /**
-     * Système d'hydratation de l'entité.
-     * Permet de transformer les données d'un tableau associatif.
-     * Les noms de champs de la table doivent correspondre aux noms des attributs de l'entité.
-     * Les underscore sont transformés en camelCase (ex: date_creation devient setDateCreation).
-     * @return void
+     * Hydrates entity from array data
+     * Converts underscores to camelCase (e.g., date_creation → setDateCreation)
      */
     protected function hydrate(array $data) : void 
     {
@@ -36,7 +30,7 @@ abstract class AbstractEntity
     }
 
     /** 
-     * Setter pour l'id.
+     * Setter for the id.
      * @param int $id
      * @return void
      */
@@ -47,7 +41,7 @@ abstract class AbstractEntity
 
     
     /**
-     * Getter pour l'id.
+     * Getter for the id.
      * @return int
      */
     public function getId() : int 

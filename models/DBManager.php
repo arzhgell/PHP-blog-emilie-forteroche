@@ -1,35 +1,28 @@
 <?php
 
 /**
- * Classe qui permet de se connecter à la base de données.
- * Cette classe est un singleton. Cela signifie qu'il n'est pas possible de créer plusieurs instances de cette classe.
- * Pour récupérer une instance de cette classe, il faut utiliser la méthode getInstance().
+ * Database connection manager (singleton)
  */
 class DBManager 
 {
-    // Création d'une classe singleton qui permet de se connecter à la base de données.
-    // On crée une instance de la classe DBConnect qui permet de se connecter à la base de données.
+    // Singleton instance
     private static $instance;
 
     private $db;
 
     /**
-     * Constructeur de la classe DBManager.
-     * Initialise la connexion à la base de données.
-     * Ce constructeur est privé. Pour récupérer une instance de la classe, il faut utiliser la méthode getInstance().
-     * @see DBManager::getInstance()
+     * Private constructor - use getInstance() instead
      */
     private function __construct() 
     {
-        // On se connecte à la base de données.
+        // Connect to database
         $this->db = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8', DB_USER, DB_PASS);
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     }
 
     /**
-     * Méthode qui permet de récupérer l'instance de la classe DBManager.
-     * @return DBManager
+     * Returns singleton instance
      */
     public static function getInstance() : DBManager
     {
@@ -40,8 +33,7 @@ class DBManager
     }
 
     /**
-     * Méthode qui permet de récupérer l'objet PDO qui permet de se connecter à la base de données.
-     * @return PDO
+     * Returns PDO connection
      */
     public function getPDO() : PDO
     {
@@ -49,11 +41,7 @@ class DBManager
     }
 
     /**
-     * Méthode qui permet d'exécuter une requête SQL.
-     * Si des paramètres sont passés, on utilise une requête préparée.
-     * @param string $sql : la requête SQL à exécuter.
-     * @param array|null $params : les paramètres de la requête SQL.
-     * @return PDOStatement : le résultat de la requête SQL.
+     * Executes SQL query with optional parameters
      */
     public function query(string $sql, ?array $params = null) : PDOStatement
     {

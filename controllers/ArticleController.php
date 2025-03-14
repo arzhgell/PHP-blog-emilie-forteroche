@@ -3,8 +3,7 @@
 class ArticleController 
 {
     /**
-     * Affiche la page d'accueil.
-     * @return void
+     * Displays the home page
      */
     public function showHome() : void
     {
@@ -16,12 +15,10 @@ class ArticleController
     }
 
     /**
-     * Affiche le détail d'un article.
-     * @return void
+     * Displays article details
      */
     public function showArticle() : void
     {
-        // Récupération de l'id de l'article demandé.
         $id = Utils::request("id", -1);
 
         $articleManager = new ArticleManager();
@@ -31,6 +28,9 @@ class ArticleController
             throw new Exception("L'article demandé n'existe pas.");
         }
 
+        $articleManager->incrementViewsCount($id);
+        $article->incrementViewsCount();
+
         $commentManager = new CommentManager();
         $comments = $commentManager->getAllCommentsByArticleId($id);
 
@@ -39,8 +39,7 @@ class ArticleController
     }
 
     /**
-     * Affiche le formulaire d'ajout d'un article.
-     * @return void
+     * Displays article creation form
      */
     public function addArticle() : void
     {
@@ -49,11 +48,10 @@ class ArticleController
     }
 
     /**
-     * Affiche la page "à propos".
-     * @return void
+     * Displays about page
      */
     public function showApropos() {
-        $view = new View("A propos");
+        $view = new View("À propos");
         $view->render("apropos");
     }
 }

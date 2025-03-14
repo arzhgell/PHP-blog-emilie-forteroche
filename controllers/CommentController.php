@@ -3,45 +3,48 @@
 class CommentController 
 {
     /**
-     * Ajoute un commentaire.
-     * @return void
+     * Adds a comment
      */
     public function addComment() : void
     {
-        // Récupération des données du formulaire.
-        $pseudo = Utils::request("pseudo");
-        $content = Utils::request("content");
-        $idArticle = Utils::request("idArticle");
+        // Vérification du jeton CSRF
+        $csrfToken = Utils::request("csrf_token");
+        if (!$csrfToken || !Utils::validateCsrfToken($csrfToken, 'comment_form')) {
+            throw new Exception("Session expirée ou requête invalide. Veuillez réessayer.");
+        }
+        
+        $pseudo = Utils::requestString("pseudo");
+        $content = Utils::requestString("content");
+        $idArticle = Utils::requestInt("idArticle", 0);
 
-        // On vérifie que les données sont valides.
-        if (empty($pseudo) || empty($content) || empty($idArticle)) {
-            throw new Exception("Tous les champs sont obligatoires. 3");
+        if (empty($pseudo) || empty($content) || $idArticle <= 0) {
+            throw new Exception("Tous les champs sont obligatoires.");
+        }
+        
+        // Validation supplémentaire pour éviter les commentaires trop courts
+        if (strlen($content) < 5) {
+            throw new Exception("Le commentaire est trop court. Veuillez écrire au moins 5 caractères.");
         }
 
-        // On vérifie que l'article existe.
         $articleManager = new ArticleManager();
         $article = $articleManager->getArticleById($idArticle);
         if (!$article) {
             throw new Exception("L'article demandé n'existe pas.");
         }
 
-        // On crée l'objet Comment.
         $comment = new Comment([
             'pseudo' => $pseudo,
             'content' => $content,
             'idArticle' => $idArticle
         ]);
 
-        // On ajoute le commentaire.
         $commentManager = new CommentManager();
         $result = $commentManager->addComment($comment);
 
-        // On vérifie que l'ajout a bien fonctionné.
         if (!$result) {
             throw new Exception("Une erreur est survenue lors de l'ajout du commentaire.");
         }
 
-        // On redirige vers la page de l'article.
         Utils::redirect("showArticle", ['id' => $idArticle]);
     }
 }

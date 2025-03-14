@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Entité User : un user est défini par son id, un login et un password.
+ * User Entity
  */ 
 class User extends AbstractEntity 
 {
@@ -9,7 +9,7 @@ class User extends AbstractEntity
     private string $password;
 
     /**
-     * Setter pour le login.
+     * Setter for the login.
      * @param string $login
      */
     public function setLogin(string $login) : void 
@@ -18,7 +18,7 @@ class User extends AbstractEntity
     }
 
     /**
-     * Getter pour le login.
+     * Getter for the login.
      * @return string
      */
     public function getLogin() : string 
@@ -27,7 +27,7 @@ class User extends AbstractEntity
     }
 
     /**
-     * Setter pour le password.
+     * Setter for the password.
      * @param string $password
      */
     public function setPassword(string $password) : void 
@@ -36,11 +36,28 @@ class User extends AbstractEntity
     }
 
     /**
-     * Getter pour le password.
+     * Getter for the password.
      * @return string
      */
     public function getPassword() : string 
     {
         return $this->password;
+    }
+
+    /**
+     * Prepare the object for serialization
+     * @return array
+     */
+    public function __sleep() 
+    {
+        return ['id', 'login', 'password'];
+    }
+
+    /**
+     * Reconstruct the object after deserialization
+     */
+    public function __wakeup() 
+    {
+        // Nothing special to do here, as properties are already set
     }
 }

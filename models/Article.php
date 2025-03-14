@@ -1,19 +1,19 @@
 <?php
 
 /**
- * Entité Article, un article est défini par les champs
- * id, id_user, title, content, date_creation, date_update
+ * Article Entity
  */
- class Article extends AbstractEntity 
- {
+class Article extends AbstractEntity 
+{
     private int $idUser;
     private string $title = "";
     private string $content = "";
     private ?DateTime $dateCreation = null;
     private ?DateTime $dateUpdate = null;  
+    private int $viewsCount = 0;
 
     /**
-     * Setter pour l'id de l'utilisateur. 
+     * Setter for the user id.
      * @param int $idUser
      */
     public function setIdUser(int $idUser) : void 
@@ -22,7 +22,7 @@
     }
 
     /**
-     * Getter pour l'id de l'utilisateur.
+     * Getter for the user id.
      * @return int
      */
     public function getIdUser() : int 
@@ -31,7 +31,7 @@
     }
 
     /**
-     * Setter pour le titre.
+     * Setter for the title.
      * @param string $title
      */
     public function setTitle(string $title) : void 
@@ -40,7 +40,7 @@
     }
 
     /**
-     * Getter pour le titre.
+     * Getter for the title.
      * @return string
      */
     public function getTitle() : string 
@@ -49,7 +49,7 @@
     }
 
     /**
-     * Setter pour le contenu.
+     * Setter for the content.
      * @param string $content
      */
     public function setContent(string $content) : void 
@@ -57,19 +57,13 @@
         $this->content = $content;
     }
 
-    
     /**
-     * Getter pour le contenu.
-     * Retourne les $length premiers caractères du contenu.
-     * @param int $length : le nombre de caractères à retourner.
-     * Si $length n'est pas défini (ou vaut -1), on retourne tout le contenu.
-     * Si le contenu est plus grand que $length, on retourne les $length premiers caractères avec "..." à la fin.
-     * @return string
+     * Returns content, optionally truncated to specified length
      */
     public function getContent(int $length = -1) : string 
     {
         if ($length > 0) {
-            // Ici, on utilise mb_substr et pas substr pour éviter de couper un caractère en deux (caractère multibyte comme les accents).
+            // Use mb_substr to handle multibyte characters correctly
             $content = mb_substr($this->content, 0, $length);
             if (strlen($this->content) > $length) {
                 $content .= "...";
@@ -80,10 +74,7 @@
     }
 
     /**
-     * Setter pour la date de création. Si la date est une string, on la convertit en DateTime.
-     * @param string|DateTime $dateCreation
-     * @param string $format : le format pour la convertion de la date si elle est une string.
-     * Par défaut, c'est le format de date mysql qui est utilisé. 
+     * Sets creation date, converting string to DateTime if needed
      */
     public function setDateCreation(string|DateTime $dateCreation, string $format = 'Y-m-d H:i:s') : void 
     {
@@ -94,8 +85,8 @@
     }
 
     /**
-     * Getter pour la date de création.
-     * Grâce au setter, on a la garantie de récupérer un objet DateTime.
+     * Getter for the creation date.
+     * Thanks to the setter, we are guaranteed to retrieve a DateTime object.
      * @return DateTime
      */
     public function getDateCreation() : DateTime 
@@ -104,10 +95,7 @@
     }
 
     /**
-     * Setter pour la date de mise à jour. Si la date est une string, on la convertit en DateTime.
-     * @param string|DateTime $dateUpdate
-     * @param string $format : le format pour la convertion de la date si elle est une string.
-     * Par défaut, c'est le format de date mysql qui est utilisé.
+     * Sets update date, converting string to DateTime if needed
      */
     public function setDateUpdate(string|DateTime $dateUpdate, string $format = 'Y-m-d H:i:s') : void 
     {
@@ -118,13 +106,39 @@
     }
 
     /**
-     * Getter pour la date de mise à jour.
-     * Grâce au setter, on a la garantie de récupérer un objet DateTime ou null
-     * si la date de mise à jour n'a pas été définie.
+     * Getter for the update date.
+     * Thanks to the setter, we are guaranteed to retrieve a DateTime object or null
+     * if the update date has not been defined.
      * @return DateTime|null
      */
     public function getDateUpdate() : ?DateTime 
     {
         return $this->dateUpdate;
     }
- }
+
+    /**
+     * Setter for the view count.
+     * @param int $viewsCount
+     */
+    public function setViewsCount(int $viewsCount) : void 
+    {
+        $this->viewsCount = $viewsCount;
+    }
+
+    /**
+     * Getter for the view count.
+     * @return int
+     */
+    public function getViewsCount() : int 
+    {
+        return $this->viewsCount;
+    }
+
+    /**
+     * Increments view count by 1
+     */
+    public function incrementViewsCount() : void 
+    {
+        $this->viewsCount++;
+    }
+}

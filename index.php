@@ -1,84 +1,53 @@
 <?php
 
+// Inclusion of a single configuration file
 require_once 'config/config.php';
 require_once 'config/autoload.php';
 
-// On récupère l'action demandée par l'utilisateur.
-// Si aucune action n'est demandée, on affiche la page d'accueil.
+// Automatic verification and update of the database schema
+require_once 'config/db_init.php';
+
+// Get the action requested by the user.
+// If no action is requested, display the home page.
 $action = Utils::request('action', 'home');
 
-// Try catch global pour gérer les erreurs
+// Define routes as an associative array [action => [controller, method]]
+$routes = [
+    // Pages accessibles à tous
+    'home' => ['ArticleController', 'showHome'],
+    'apropos' => ['ArticleController', 'showApropos'],
+    'showArticle' => ['ArticleController', 'showArticle'],
+    'addArticle' => ['ArticleController', 'addArticle'],
+    'addComment' => ['CommentController', 'addComment'],
+    
+    // Section admin et connexion
+    'admin' => ['AdminController', 'showAdmin'],
+    'connectionForm' => ['AdminController', 'displayConnectionForm'],
+    'connectUser' => ['AdminController', 'connectUser'],
+    'disconnectUser' => ['AdminController', 'disconnectUser'],
+    'showUpdateArticleForm' => ['AdminController', 'showUpdateArticleForm'],
+    'updateArticle' => ['AdminController', 'updateArticle'],
+    'deleteArticle' => ['AdminController', 'deleteArticle'],
+    'showMonitoring' => ['AdminController', 'showMonitoring'],
+    'showComments' => ['AdminController', 'showComments'],
+    'deleteComment' => ['AdminController', 'deleteComment'],
+];
+
+// Global try catch to handle errors
 try {
-    // Pour chaque action, on appelle le bon contrôleur et la bonne méthode.
-    switch ($action) {
-        // Pages accessibles à tous.
-        case 'home':
-            $articleController = new ArticleController();
-            $articleController->showHome();
-            break;
-
-        case 'apropos':
-            $articleController = new ArticleController();
-            $articleController->showApropos();
-            break;
+    // Check if the requested action exists in our routes
+    if (isset($routes[$action])) {
+        // Get controller and method from routes
+        list($controllerName, $methodName) = $routes[$action];
         
-        case 'showArticle': 
-            $articleController = new ArticleController();
-            $articleController->showArticle();
-            break;
-
-        case 'addArticle':
-            $articleController = new ArticleController();
-            $articleController->addArticle();
-            break;
-
-        case 'addComment':
-            $commentController = new CommentController();
-            $commentController->addComment();
-            break;
-
-
-        // Section admin & connexion. 
-        case 'admin': 
-            $adminController = new AdminController();
-            $adminController->showAdmin();
-            break;
-
-        case 'connectionForm':
-            $adminController = new AdminController();
-            $adminController->displayConnectionForm();
-            break;
-
-        case 'connectUser': 
-            $adminController = new AdminController();
-            $adminController->connectUser();
-            break;
-
-        case 'disconnectUser':
-            $adminController = new AdminController();
-            $adminController->disconnectUser();
-            break;
-
-        case 'showUpdateArticleForm':
-            $adminController = new AdminController();
-            $adminController->showUpdateArticleForm();
-            break;
-
-        case 'updateArticle': 
-            $adminController = new AdminController();
-            $adminController->updateArticle();
-            break;
-
-        case 'deleteArticle':
-            $adminController = new AdminController();
-            $adminController->deleteArticle();
-            break;
-
-        default:
-            throw new Exception("La page demandée n'existe pas.");
+        // Instantiate controller and call method
+        $controller = new $controllerName();
+        $controller->$methodName();
+    } else {
+        throw new Exception("La page demandée n'existe pas.");
     }
 } catch (Exception $e) {
-    // En cas d'erreur, on affiche la page d'erreur.
+    // In case of error, display the error page.
     $errorView = new View('Erreur');
     $errorView->render('errorPage', ['errorMessage' => $e->getMessage()]);
 }

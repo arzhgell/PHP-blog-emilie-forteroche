@@ -1,15 +1,13 @@
 <?php
 
 /** 
- * Classe UserManager pour gérer les requêtes liées aux users et à l'authentification.
+ * Manages user authentication
  */
 
 class UserManager extends AbstractEntityManager 
 {
     /**
-     * Récupère un user par son login.
-     * @param string $login
-     * @return ?User
+     * Gets user by login
      */
     public function getUserByLogin(string $login) : ?User 
     {

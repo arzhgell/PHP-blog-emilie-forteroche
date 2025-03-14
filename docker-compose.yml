@@ -1,0 +1,85 @@
+services:
+  # Service PHP avec Apache
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: php_blog_forteroche
+    ports:
+      - "8976:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      DB_HOST: mysql
+      DB_USER: user
+      DB_PASS: ${DB_PASSWORD:-password}
+      DB_NAME: blog_forteroche
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    networks:
+      - forteroche
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+  # Service MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_blog_forteroche
+    restart: unless-stopped
+    ports:
+      - "33078:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./blog_forteroche.sql:/docker-entrypoint-initdb.d/blog_forteroche.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: blog_forteroche
+      MYSQL_USER: user
+      MYSQL_PASSWORD: ${DB_PASSWORD:-password}
+      MYSQL_ROOT_HOST: '%'
+    networks:
+      - forteroche
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-p${DB_PASSWORD:-password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Service phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_blog_forteroche
+    restart: unless-stopped
+    ports:
+      - "8977:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+      UPLOAD_LIMIT: 64M
+    depends_on:
+      - mysql
+    networks:
+      - forteroche
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 128M
+
+networks:
+  forteroche:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    name: blog_forteroche_data 

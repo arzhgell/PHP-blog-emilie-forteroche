@@ -1,10 +1,8 @@
 <?php
 
 /**
- * Entité représentant un commentaire.
- * Avec les champs id, pseudo, content, et idArticle.
+ * Comment Entity
  */
- 
 class Comment extends AbstractEntity 
 {
     private int $idArticle;
@@ -13,7 +11,7 @@ class Comment extends AbstractEntity
     private DateTime $dateCreation;
     
     /**
-     * Getter pour l'id de l'article.
+     * Getter for the article id.
      * @return int
      */
     public function getIdArticle(): int 
@@ -22,7 +20,7 @@ class Comment extends AbstractEntity
     }
 
     /**
-     * Setter pour l'id de l'article.
+     * Setter for the article id.
      * @param int $idArticle
      * @return void
      */
@@ -32,7 +30,7 @@ class Comment extends AbstractEntity
     }
 
     /**
-     * Getter pour le pseudo.
+     * Getter for the pseudo.
      * @return string
      */
     public function getPseudo(): string 
@@ -41,7 +39,7 @@ class Comment extends AbstractEntity
     }
 
     /**
-     * Setter pour le pseudo.
+     * Setter for the pseudo.
      * @param string $pseudo
      * @return void
      */
@@ -51,7 +49,7 @@ class Comment extends AbstractEntity
     }
 
     /**
-     * Getter pour le contenu.
+     * Getter for the content.
      * @return string
      */
     public function getContent(): string 
@@ -60,7 +58,7 @@ class Comment extends AbstractEntity
     }
 
     /**
-     * Setter pour le contenu.
+     * Setter for the content.
      * @param string $content
      * @return void
      */
@@ -70,7 +68,7 @@ class Comment extends AbstractEntity
     }
 
     /**
-     * Getter pour la date de création.
+     * Getter for the creation date.
      * @return DateTime
      */
     public function getDateCreation(): DateTime 
@@ -79,11 +77,7 @@ class Comment extends AbstractEntity
     }
 
     /**
-     * Setter pour la date de création. 
-     * Si la date est une string, on la convertit en DateTime.
-     * @param string|DateTime $dateCreation
-     * @param string $format : le format pour la convertion de la date si elle est une string.
-     * Par défaut, c'est le format de date mysql qui est utilisé. 
+     * Sets creation date, converting string to DateTime if needed
      */
     public function setDateCreation(string|DateTime $dateCreation, string $format = 'Y-m-d H:i:s') : void 
     {
@@ -92,5 +86,4 @@ class Comment extends AbstractEntity
         }
         $this->dateCreation = $dateCreation;
     }
-
 }

@@ -1,13 +1,12 @@
 <?php
 
 /**
- * Classe qui gère les articles.
+ * Manages article operations
  */
 class ArticleManager extends AbstractEntityManager 
 {
     /**
-     * Récupère tous les articles.
-     * @return array : un tableau d'objets Article.
+     * Gets all articles
      */
     public function getAllArticles() : array
     {
@@ -22,9 +21,7 @@ class ArticleManager extends AbstractEntityManager
     }
     
     /**
-     * Récupère un article par son id.
-     * @param int $id : l'id de l'article.
-     * @return Article|null : un objet Article ou null si l'article n'existe pas.
+     * Gets article by ID
      */
     public function getArticleById(int $id) : ?Article
     {
@@ -38,10 +35,7 @@ class ArticleManager extends AbstractEntityManager
     }
 
     /**
-     * Ajoute ou modifie un article.
-     * On sait si l'article est un nouvel article car son id sera -1.
-     * @param Article $article : l'article à ajouter ou modifier.
-     * @return void
+     * Adds or updates article based on ID
      */
     public function addOrUpdateArticle(Article $article) : void 
     {
@@ -53,9 +47,7 @@ class ArticleManager extends AbstractEntityManager
     }
 
     /**
-     * Ajoute un article.
-     * @param Article $article : l'article à ajouter.
-     * @return void
+     * Adds a new article
      */
     public function addArticle(Article $article) : void
     {
@@ -68,9 +60,7 @@ class ArticleManager extends AbstractEntityManager
     }
 
     /**
-     * Modifie un article.
-     * @param Article $article : l'article à modifier.
-     * @return void
+     * Updates existing article
      */
     public function updateArticle(Article $article) : void
     {
@@ -83,13 +73,31 @@ class ArticleManager extends AbstractEntityManager
     }
 
     /**
-     * Supprime un article.
-     * @param int $id : l'id de l'article à supprimer.
-     * @return void
+     * Deletes article by ID
      */
     public function deleteArticle(int $id) : void
     {
         $sql = "DELETE FROM article WHERE id = :id";
         $this->db->query($sql, ['id' => $id]);
+    }
+
+    /**
+     * Increments article view count
+     */
+    public function incrementViewsCount(int $id) : void
+    {
+        $sql = "UPDATE article SET views_count = views_count + 1 WHERE id = :id";
+        $this->db->query($sql, ['id' => $id]);
+    }
+
+    /**
+     * Gets article view count
+     */
+    public function getViewsCount(int $id) : int
+    {
+        $sql = "SELECT views_count FROM article WHERE id = :id";
+        $result = $this->db->query($sql, ['id' => $id]);
+        $data = $result->fetch();
+        return $data ? (int)$data['views_count'] : 0;
     }
 }

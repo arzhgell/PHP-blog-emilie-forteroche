@@ -1,15 +1,14 @@
 <?php
 
 /**
- * Classe abstraite qui représente un manager. Elle récupère automatiquement le gestionnaire de base de données. 
+ * Base manager class with database access
  */
 abstract class AbstractEntityManager {
     
     protected $db;
 
     /**
-     * Constructeur de la classe.
-     * Il récupère automatiquement l'instance de DBManager. 
+     * Constructor initializes database connection
      */
     public function __construct() 
     {

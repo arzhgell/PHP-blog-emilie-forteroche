@@ -1,15 +1,14 @@
 <?php
 
 /**
- * Cette classe génère les vues en fonction de ce que chaque contrôlleur lui passe en paramètre. 
+ * View generation class
  */
 class View 
 {
     /**
-     * Le titre de la page.
+     * Page title
      */
     private string $title;
-    
     
     /**
      * Constructeur. 
@@ -20,17 +19,14 @@ class View
     }
     
     /**
-     * Cette méthode retourne une page complète. 
-     * @param string $viewPath : le chemin de la vue demandée par le controlleur. 
-     * @param array $params : les paramètres que le controlleur a envoyé à la vue.
-     * @return string
+     * Renders a complete page
      */
     public function render(string $viewName, array $params = []) : void 
     {
-        // On s'occupe de la vue envoyée
+        // Handle the requested view
         $viewPath = $this->buildViewPath($viewName);
         
-        // Les deux variables ci-dessous sont utilisées dans le "main.php" qui est le template principal.
+        // These variables are used in main.php template
         $content = $this->_renderViewFromTemplate($viewPath, $params);
         $title = $this->title;
         ob_start();
@@ -39,16 +35,12 @@ class View
     }
     
     /**
-     * Coeur de la classe, c'est ici qu'est généré ce que le controlleur a demandé. 
-     * @param $viewPath : le chemin de la vue demandée par le controlleur.
-     * @param array $params : les paramètres que le controlleur a envoyés à la vue.
-     * @throws Exception : si la vue n'existe pas.
-     * @return string : le contenu de la vue.
+     * Core rendering method
      */
     private function _renderViewFromTemplate(string $viewPath, array $params = []) : string
     {  
         if (file_exists($viewPath)) {
-            extract($params); // On transforme les diverses variables stockées dans le tableau "params" en véritables variables qui pourront être lues dans le template.
+            extract($params); // Transform array variables into actual variables for the template
             ob_start();
             require($viewPath);
             return ob_get_clean();
@@ -58,9 +50,7 @@ class View
     }
 
     /**
-     * Cette méthode construit le chemin vers la vue demandée.
-     * @param string $viewName : le nom de la vue demandée.
-     * @return string : le chemin vers la vue demandée.
+     * Builds path to the requested view
      */
     private function buildViewPath(string $viewName) : string
     {
