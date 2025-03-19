@@ -1,30 +1,19 @@
 <?php
 
-/**
- * Manages article operations
- */
 class ArticleManager extends AbstractEntityManager 
 {
-    /**
-     * Gets all articles
-     * @param string $sortBy Field to sort by (title, date_creation, date_update, views_count)
-     * @param string $sortOrder Sort order (asc, desc)
-     * @return array Array of Article objects
-     */
     public function getAllArticles(string $sortBy = 'date_creation', string $sortOrder = 'desc') : array
     {
-        // Validate sort parameters
         $allowedSortFields = ['title', 'date_creation', 'date_update', 'views_count'];
         if (!in_array($sortBy, $allowedSortFields)) {
-            $sortBy = 'date_creation'; // Default value if sort field is not valid
+            $sortBy = 'date_creation';
         }
 
         $allowedSortOrders = ['asc', 'desc'];
         if (!in_array($sortOrder, $allowedSortOrders)) {
-            $sortOrder = 'desc'; // Default value if sort order is not valid
+            $sortOrder = 'desc';
         }
 
-        // Build SQL query with ORDER BY clause
         $sql = "SELECT * FROM article ORDER BY {$sortBy} {$sortOrder}";
         $result = $this->db->query($sql);
         $articles = [];
@@ -35,9 +24,6 @@ class ArticleManager extends AbstractEntityManager
         return $articles;
     }
     
-    /**
-     * Gets article by ID
-     */
     public function getArticleById(int $id) : ?Article
     {
         $sql = "SELECT * FROM article WHERE id = :id";
@@ -49,9 +35,6 @@ class ArticleManager extends AbstractEntityManager
         return null;
     }
 
-    /**
-     * Adds or updates article based on ID
-     */
     public function addOrUpdateArticle(Article $article) : void 
     {
         if ($article->getId() == -1) {
@@ -61,9 +44,6 @@ class ArticleManager extends AbstractEntityManager
         }
     }
 
-    /**
-     * Adds a new article
-     */
     public function addArticle(Article $article) : void
     {
         $sql = "INSERT INTO article (id_user, title, content, date_creation) VALUES (:id_user, :title, :content, NOW())";
@@ -74,9 +54,6 @@ class ArticleManager extends AbstractEntityManager
         ]);
     }
 
-    /**
-     * Updates existing article
-     */
     public function updateArticle(Article $article) : void
     {
         $sql = "UPDATE article SET title = :title, content = :content, date_update = NOW() WHERE id = :id";
@@ -87,27 +64,18 @@ class ArticleManager extends AbstractEntityManager
         ]);
     }
 
-    /**
-     * Deletes article by ID
-     */
     public function deleteArticle(int $id) : void
     {
         $sql = "DELETE FROM article WHERE id = :id";
         $this->db->query($sql, ['id' => $id]);
     }
 
-    /**
-     * Increments article view count
-     */
     public function incrementViewsCount(int $id) : void
     {
         $sql = "UPDATE article SET views_count = views_count + 1 WHERE id = :id";
         $this->db->query($sql, ['id' => $id]);
     }
 
-    /**
-     * Gets article view count
-     */
     public function getViewsCount(int $id) : int
     {
         $sql = "SELECT views_count FROM article WHERE id = :id";

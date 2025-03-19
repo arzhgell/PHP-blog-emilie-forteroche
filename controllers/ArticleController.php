@@ -2,9 +2,6 @@
 
 class ArticleController 
 {
-    /**
-     * Displays the home page
-     */
     public function showHome() : void
     {
         $articleManager = new ArticleManager();
@@ -14,9 +11,6 @@ class ArticleController
         $view->render("home", ['articles' => $articles]);
     }
 
-    /**
-     * Displays article details
-     */
     public function showArticle() : void
     {
         $id = Utils::request("id", -1);
@@ -38,18 +32,12 @@ class ArticleController
         $view->render("detailArticle", ['article' => $article, 'comments' => $comments]);
     }
 
-    /**
-     * Displays article creation form
-     */
     public function addArticle() : void
     {
         $view = new View("Ajouter un article");
         $view->render("addArticle");
     }
 
-    /**
-     * Displays about page
-     */
     public function showApropos() {
         $view = new View("À propos");
         $view->render("apropos");

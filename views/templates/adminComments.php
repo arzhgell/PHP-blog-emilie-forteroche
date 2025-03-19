@@ -1,16 +1,9 @@
 <?php 
-    /* 
-     * Comments management page display
-     */
-
-    // Function to generate sort links
     function getSortLink($field, $currentSortBy, $currentSortOrder, $currentPage, $commentsPerPage) {
         $newOrder = ($currentSortBy === $field && $currentSortOrder === 'asc') ? 'desc' : 'asc';
         return "index.php?action=showComments&sort={$field}&order={$newOrder}&page={$currentPage}&per_page={$commentsPerPage}";
     }
-    
-    // Function to generate pagination links
-    function getPaginationLink($page, $sortBy, $sortOrder, $commentsPerPage) {
+        function getPaginationLink($page, $sortBy, $sortOrder, $commentsPerPage) {
         return "index.php?action=showComments&page={$page}&sort={$sortBy}&order={$sortOrder}&per_page={$commentsPerPage}";
     }
 ?>
@@ -81,7 +74,7 @@
                             </a>
                         </td>
                         <td class="actions">
-                            <a href="index.php?action=deleteComment&id=<?= $comment->getId() ?>&csrf_token=<?= Utils::generateCsrfToken('delete_comment') ?>" 
+                            <a href="index.php?action=deleteComment&id=<?= $comment->getId() ?>" 
                                class="delete-link"
                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');">
                                 Supprimer
@@ -110,11 +103,9 @@
                         <?php endif; ?>
                         
                         <?php
-                            // Display a limited number of pages around the current page
                             $startPage = max(1, $pagination['currentPage'] - 2);
                             $endPage = min($pagination['totalPages'], $pagination['currentPage'] + 2);
                             
-                            // Ensure we display at least 5 pages if possible
                             if ($endPage - $startPage < 4) {
                                 $endPage = min($pagination['totalPages'], $startPage + 4);
                                 if ($endPage - $startPage < 4) {

@@ -1,14 +1,7 @@
 <?php
 
-/** 
- * Manages user authentication
- */
-
 class UserManager extends AbstractEntityManager 
 {
-    /**
-     * Gets user by login
-     */
     public function getUserByLogin(string $login) : ?User 
     {
         $sql = "SELECT * FROM user WHERE login = :login";

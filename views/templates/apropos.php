@@ -1,9 +1,3 @@
-<?php
-    /**
-     * This template displays the "about" page.
-     */
-?>
-
 <article class="mainArticle">
     <h2>À propos</h2>
     <span class="quotation">«</span>

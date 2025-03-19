@@ -1,9 +1,4 @@
-<?php 
-    /* 
-     * Display of the monitoring page: blog statistics.
-     */
-
-    // Function to generate sort links
+<?php
     function getSortLink($field, $currentSortBy, $currentSortOrder) {
         $newOrder = ($currentSortBy === $field && $currentSortOrder === 'asc') ? 'desc' : 'asc';
         return "index.php?action=showMonitoring&sort={$field}&order={$newOrder}";

@@ -1,18 +1,8 @@
 <?php
-/**
- * Database initialization script
- * This script is executed at application startup to automatically check and update
- * the database structure.
- */
-
-// Include configuration file only if constants are not already defined
 if (!defined('DB_HOST')) {
     require_once 'config.php';
 }
 
-/**
- * Class for database initialization and verification
- */
 class DatabaseInitializer
 {
     private $pdo;
@@ -20,11 +10,6 @@ class DatabaseInitializer
     private $logFile;
     private $updatePerformed = false;
 
-    /**
-     * Constructor
-     * @param PDO $pdo PDO instance for database connection
-     * @param string $logFile Path to log file (optional)
-     */
     public function __construct(PDO $pdo, $logFile = null)
     {
         $this->pdo = $pdo;
@@ -32,12 +17,8 @@ class DatabaseInitializer
         $this->initExpectedSchema();
     }
 
-    /**
-     * Initialize the expected database schema
-     */
     private function initExpectedSchema()
     {
-        // Definition of the expected schema for each table
         $this->expectedSchema = [
             'article' => [
                 'id' => ['type' => 'int(11)', 'null' => false, 'default' => null, 'extra' => 'auto_increment'],
@@ -64,16 +45,11 @@ class DatabaseInitializer
         ];
     }
 
-    /**
-     * Check and update the database schema
-     * @return array Results of checks and updates
-     */
     public function checkAndUpdateSchema()
     {
         $results = [];
 
         foreach ($this->expectedSchema as $tableName => $columns) {
-            // Check if table exists
             if (!$this->tableExists($tableName)) {
                 $message = "La table '$tableName' n'existe pas. Création nécessaire.";
                 $this->log($message);
@@ -83,10 +59,8 @@ class DatabaseInitializer
                 continue;
             }
 
-            // Get current table structure
             $currentColumns = $this->getTableColumns($tableName);
             
-            // Compare columns
             $missingColumns = [];
             $modifiedColumns = [];
 
@@ -94,7 +68,6 @@ class DatabaseInitializer
                 if (!isset($currentColumns[$columnName])) {
                     $missingColumns[$columnName] = $columnDef;
                 } else {
-                    // Check if column definition matches
                     $currentDef = $currentColumns[$columnName];
                     if ($this->columnNeedsUpdate($columnDef, $currentDef)) {
                         $modifiedColumns[$columnName] = $columnDef;
@@ -102,7 +75,6 @@ class DatabaseInitializer
                 }
             }
 
-            // Add missing columns
             if (!empty($missingColumns)) {
                 foreach ($missingColumns as $columnName => $columnDef) {
                     $message = "Colonne '$columnName' manquante dans la table '$tableName'. Ajout en cours...";
@@ -113,7 +85,6 @@ class DatabaseInitializer
                 }
             }
 
-            // Modify columns that need updating
             if (!empty($modifiedColumns)) {
                 foreach ($modifiedColumns as $columnName => $columnDef) {
                     $message = "Colonne '$columnName' dans la table '$tableName' nécessite une mise à jour. Modification en cours...";
@@ -132,20 +103,11 @@ class DatabaseInitializer
         return $results;
     }
 
-    /**
-     * Check if an update was performed
-     * @return bool True if an update was performed, false otherwise
-     */
     public function wasUpdatePerformed()
     {
         return $this->updatePerformed;
     }
 
-    /**
-     * Check if a table exists in the database
-     * @param string $tableName Table name
-     * @return bool True if the table exists, false otherwise
-     */
     private function tableExists($tableName)
     {
         $stmt = $this->pdo->prepare("SHOW TABLES LIKE :tableName");
@@ -153,11 +115,6 @@ class DatabaseInitializer
         return $stmt->rowCount() > 0;
     }
 
-    /**
-     * Get the column structure of a table
-     * @param string $tableName Table name
-     * @return array Column structure
-     */
     private function getTableColumns($tableName)
     {
         $columns = [];
@@ -176,30 +133,20 @@ class DatabaseInitializer
         return $columns;
     }
 
-    /**
-     * Check if a column needs to be updated
-     * @param array $expected Expected column definition
-     * @param array $current Current column definition
-     * @return bool True if the column needs to be updated, false otherwise
-     */
     private function columnNeedsUpdate($expected, $current)
     {
-        // Compare types (ignore case and spaces)
         if (strtolower(trim($expected['type'])) !== strtolower(trim($current['type']))) {
             return true;
         }
         
-        // Compare nullability
         if ($expected['null'] !== $current['null']) {
             return true;
         }
         
-        // Compare default values
         if ($expected['default'] !== $current['default']) {
             return true;
         }
-        
-        // Compare extras if defined
+
         if (isset($expected['extra']) && $expected['extra'] !== $current['extra']) {
             return true;
         }
@@ -207,11 +154,7 @@ class DatabaseInitializer
         return false;
     }
 
-    /**
-     * Create a new table
-     * @param string $tableName Table name
-     * @param array $columns Column definitions
-     */
+
     private function createTable($tableName, $columns)
     {
         $columnDefs = [];
@@ -233,12 +176,6 @@ class DatabaseInitializer
         }
     }
 
-    /**
-     * Add a column to a table
-     * @param string $tableName Table name
-     * @param string $columnName Column name
-     * @param array $columnDef Column definition
-     */
     private function addColumn($tableName, $columnName, $columnDef)
     {
         $columnDefinition = $this->buildColumnDefinition($columnName, $columnDef);
@@ -254,12 +191,6 @@ class DatabaseInitializer
         }
     }
 
-    /**
-     * Modify a column in a table
-     * @param string $tableName Table name
-     * @param string $columnName Column name
-     * @param array $columnDef Column definition
-     */
     private function modifyColumn($tableName, $columnName, $columnDef)
     {
         $columnDefinition = $this->buildColumnDefinition($columnName, $columnDef);
@@ -275,12 +206,6 @@ class DatabaseInitializer
         }
     }
 
-    /**
-     * Builds the SQL definition of a column
-     * @param string $columnName Column name
-     * @param array $columnDef Column definition
-     * @return string SQL definition of the column
-     */
     private function buildColumnDefinition($columnName, $columnDef)
     {
         $definition = "`$columnName` " . $columnDef['type'];
@@ -302,11 +227,6 @@ class DatabaseInitializer
         return $definition;
     }
 
-    /**
-     * Logs a message to the log file
-     * @param string $message Message to log
-     * @param bool $isError Indicates if the message is an error
-     */
     private function log($message, $isError = false)
     {
         $logPrefix = $isError ? '[ERROR] ' : '[INFO] ';
@@ -318,7 +238,6 @@ class DatabaseInitializer
     }
 }
 
-// Création de la connexion PDO
 try {
     $pdo = new PDO(
         'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8',
@@ -330,23 +249,18 @@ try {
         ]
     );
     
-    // Définir le chemin du fichier de log
     $logFile = __DIR__ . '/../logs/db_updates.log';
     
-    // Créer le dossier de logs s'il n'existe pas
     if (!file_exists(dirname($logFile))) {
         mkdir(dirname($logFile), 0777, true);
     }
     
-    // Vérification et mise à jour du schéma
     $dbInitializer = new DatabaseInitializer($pdo, $logFile);
     $dbInitializer->checkAndUpdateSchema();
     
 } catch (PDOException $e) {
-    // En cas d'erreur, on l'enregistre dans le fichier de log
     $logFile = __DIR__ . '/../logs/db_errors.log';
     
-    // Créer le dossier de logs s'il n'existe pas
     if (!file_exists(dirname($logFile))) {
         mkdir(dirname($logFile), 0777, true);
     }

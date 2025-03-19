@@ -1,10 +1,3 @@
-<?php
-    /**
-     * This template displays an article and its comments.
-     * It also displays a form to add a comment.
-     */
-?>
-
 <article class="mainArticle">
     <h2><?= htmlspecialchars($article->getTitle()) ?></h2>
     <div class="quotation">"</div>
@@ -43,9 +36,7 @@
     <form action="index.php?action=addComment" method="post" class="foldedCorner">
         <h2>Ajouter un commentaire</h2>
 
-        <div class="formComment formGrid">
-            <input type="hidden" name="csrf_token" value="<?= Utils::generateCsrfToken('comment_form') ?>">
-            
+        <div class="formComment formGrid">            
             <label for="pseudo">Nom</label>
             <input type="text" name="pseudo" id="pseudo" required maxlength="50">
 

@@ -1,10 +1,3 @@
-<?php 
-    /* 
-     * Admin section display: list of articles with "edit" button for each.
-     * And a form to add an article.
-     */
-?>
-
 <h2>Gestion des Articles</h2>
 
 <div class="adminArticle">
@@ -16,7 +9,7 @@
             <div><a class="submit" href="index.php?action=showUpdateArticleForm&id=<?= $article->getId() ?>">Modifier</a></div>
             <div>
                 <a class="submit" 
-                   href="index.php?action=deleteArticle&id=<?= $article->getId() ?>&csrf_token=<?= Utils::generateCsrfToken('delete_article') ?>" 
+                   href="index.php?action=deleteArticle&id=<?= $article->getId() ?>" 
                    <?= Utils::askConfirmation("Êtes-vous sûr de vouloir supprimer cet article ?") ?>>
                     Supprimer
                 </a>

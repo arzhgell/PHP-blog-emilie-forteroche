@@ -1,9 +1,3 @@
-<?php
-    /* 
-     * Display of articles list.
-     */
-?>
-
 <div class="articleList">
     <?php foreach ($articles as $article) { ?>
         <article>

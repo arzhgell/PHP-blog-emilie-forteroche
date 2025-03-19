@@ -1,5 +1,4 @@
 services:
-  # Service PHP avec Apache
   php:
     build:
       context: .
@@ -25,7 +24,6 @@ services:
           cpus: '0.5'
           memory: 256M
 
-  # Service MySQL
   mysql:
     image: mysql:8.0
     container_name: mysql_blog_forteroche
@@ -34,7 +32,6 @@ services:
       - "33078:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./blog_forteroche.sql:/docker-entrypoint-initdb.d/blog_forteroche.sql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_DATABASE: blog_forteroche
@@ -54,7 +51,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Service phpMyAdmin
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin_blog_forteroche

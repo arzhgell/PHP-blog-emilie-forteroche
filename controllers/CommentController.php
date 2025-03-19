@@ -2,17 +2,8 @@
 
 class CommentController 
 {
-    /**
-     * Adds a comment
-     */
     public function addComment() : void
     {
-        // Vérification du jeton CSRF
-        $csrfToken = Utils::request("csrf_token");
-        if (!$csrfToken || !Utils::validateCsrfToken($csrfToken, 'comment_form')) {
-            throw new Exception("Session expirée ou requête invalide. Veuillez réessayer.");
-        }
-        
         $pseudo = Utils::requestString("pseudo");
         $content = Utils::requestString("content");
         $idArticle = Utils::requestInt("idArticle", 0);
@@ -21,7 +12,6 @@ class CommentController
             throw new Exception("Tous les champs sont obligatoires.");
         }
         
-        // Validation supplémentaire pour éviter les commentaires trop courts
         if (strlen($content) < 5) {
             throw new Exception("Le commentaire est trop court. Veuillez écrire au moins 5 caractères.");
         }
